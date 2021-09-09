@@ -3,6 +3,7 @@ package com.itca.crud1_sqlite;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
@@ -17,6 +18,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private EditText etcodigo, etdescripcion, etprecio;
     private Button btnAlta, btnConsultaCodigo, btnConsultaDescripcion, btnEliminar, btnModificar, btnSalir, btnNuevo;
+
+    String codigo, descripcion, precio;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,6 +36,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnModificar = findViewById(R.id.btnModificar);
         btnSalir = findViewById(R.id.btnSalir);
         btnNuevo = findViewById(R.id.btnNuevo);
+
+        btnNuevo.setEnabled(false);
+        btnSalir.setEnabled(false);
 
         btnAlta.setOnClickListener(this);
         btnConsultaCodigo.setOnClickListener(this);
@@ -51,9 +57,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (view.getId()){
             case R.id.btnAlta:
                 //Toast.makeText(this, "Has hecho clic en botón Alta", Toast.LENGTH_SHORT).show();
-                String codigo = etcodigo.getText().toString();
-                String descripcion = etdescripcion.getText().toString();
-                String precio = etprecio.getText().toString();
+                codigo = etcodigo.getText().toString();
+                descripcion = etdescripcion.getText().toString();
+                precio = etprecio.getText().toString();
                 ContentValues registro = new ContentValues();
                 registro.put("codigo", codigo);
                 registro.put("descripcion", descripcion);
@@ -77,7 +83,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.btnConsultaCodigo:
                 //Toast.makeText(this, "Has hecho clic en botón consultar por código", Toast.LENGTH_SHORT).show();
-                
+                codigo = etcodigo.getText().toString();
+                if(codigo.isEmpty()) {
+                    etcodigo.setError("Campo obligatorio.");
+                }else{
+                    Cursor fila = bd.rawQuery("select descripcion, precio from articulos where codigo="+codigo, null);
+                    if(fila.moveToFirst()){
+                        etdescripcion.setText(fila.getString(0));
+                        etprecio.setText(fila.getString(1));
+                    }else{
+                        Toast.makeText(this, "No existe un artículo con dicho código.", Toast.LENGTH_SHORT).show();
+                    }
+                    bd.close();
+                }
 
                 break;
             case R.id.btnConsultaDescripcion:
