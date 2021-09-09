@@ -2,6 +2,8 @@ package com.itca.crud1_sqlite;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -9,6 +11,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+
+    AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this, "administracion.db", null, 1);
+    //final SQLiteDatabase bd = admin.getWritableDatabase();
+
     private EditText etcodigo, etdescripcion, etprecio;
     private Button btnAlta, btnConsultaCodigo, btnConsultaDescripcion, btnEliminar, btnModificar, btnSalir, btnNuevo;
     @Override
@@ -39,13 +45,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
+
+        SQLiteDatabase bd = admin.getWritableDatabase();
+
         switch (view.getId()){
             case R.id.btnAlta:
                 //Toast.makeText(this, "Has hecho clic en botón Alta", Toast.LENGTH_SHORT).show();
                 String codigo = etcodigo.getText().toString();
                 String descripcion = etdescripcion.getText().toString();
                 String precio = etprecio.getText().toString();
-
+                ContentValues registro = new ContentValues();
+                registro.put("codigo", codigo);
+                registro.put("descripcion", descripcion);
+                registro.put("precio", precio);
+                //bd.insert("articulos", null, registro);
                 if(codigo.isEmpty()){
                     etcodigo.setError("Campo obligatorio.");
                 }else if(descripcion.isEmpty()){
@@ -53,13 +66,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }else if(precio.isEmpty()){
                     etprecio.setError("Campo obligatorio");
                 }else{
-                    Toast.makeText(this, "Has superado la validación", Toast.LENGTH_SHORT).show();
+                    bd.insert("articulos", null, registro);
+                    bd.close();
+                    etcodigo.setText(null);
+                    etdescripcion.setText(null);
+                    etprecio.setText(null);
+                    Toast.makeText(this, "Registro guardado correctamente.", Toast.LENGTH_SHORT).show();
                 }
-
                 break;
+
             case R.id.btnConsultaCodigo:
                 //Toast.makeText(this, "Has hecho clic en botón consultar por código", Toast.LENGTH_SHORT).show();
-
+                
 
                 break;
             case R.id.btnConsultaDescripcion:
