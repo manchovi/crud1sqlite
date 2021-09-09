@@ -37,9 +37,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnSalir = findViewById(R.id.btnSalir);
         btnNuevo = findViewById(R.id.btnNuevo);
 
-        btnNuevo.setEnabled(false);
-        btnSalir.setEnabled(false);
-
         btnAlta.setOnClickListener(this);
         btnConsultaCodigo.setOnClickListener(this);
         btnConsultaDescripcion.setOnClickListener(this);
@@ -47,16 +44,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnModificar.setOnClickListener(this);
         btnSalir.setOnClickListener(this);
         btnNuevo.setOnClickListener(this);
+
     }
 
     @Override
     public void onClick(View view) {
-
         SQLiteDatabase bd = admin.getWritableDatabase();
-
         switch (view.getId()){
             case R.id.btnAlta:
-                //Toast.makeText(this, "Has hecho clic en botón Alta", Toast.LENGTH_SHORT).show();
                 codigo = etcodigo.getText().toString();
                 descripcion = etdescripcion.getText().toString();
                 precio = etprecio.getText().toString();
@@ -96,11 +91,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                     bd.close();
                 }
-
                 break;
             case R.id.btnConsultaDescripcion:
                 //Toast.makeText(this, "Has hecho clic en botón consultar por descripción", Toast.LENGTH_SHORT).show();
-
+                descripcion = etdescripcion.getText().toString();
+                if(descripcion.isEmpty()) {
+                    etdescripcion.setError("Campo obligatorio.");
+                }else{
+                    Cursor fila = bd.rawQuery("select codigo, precio from articulos where descripcion = '" + descripcion + "'", null);
+                    if(fila.moveToFirst()){
+                        etcodigo.setText(fila.getString(0));
+                        etprecio.setText(fila.getString(1));
+                    }else{
+                        Toast.makeText(this, "No existe un artículo con dicho código.", Toast.LENGTH_SHORT).show();
+                    }
+                    bd.close();
+                }
                 break;
             case R.id.btnEliminar:
                 Toast.makeText(this, "Has hecho clic en botón Eliminar", Toast.LENGTH_SHORT).show();
